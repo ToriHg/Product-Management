@@ -1,4 +1,5 @@
-import * as React from 'react';
+import { forwardRef, useEffect, useState, useMemo } from "react";
+import { Snackbar, Alert } from "@mui/material";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,8 +9,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { apiPost } from "./Services";
 
 
 
@@ -21,37 +22,68 @@ export default function LoginPage() {
 
 const navigate = useNavigate();
 
+//SnackBar
+const [opens, setOpens] = useState(false);
+const [snackContent, setSnackContent] = useState("");
+const [severity, setSeverity] = useState("success");
 
+const SnackbarAlert = forwardRef(function SnackbarAlert(props, ref) {
+  return <Alert elevation={6} ref={ref} {...props} />;
+});
 
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    })
-    axios.post('https://app.spiritx.co.nz/api/login',data)
-    .then((result)=>{
-      console.log(result)
-      console.log('token', result)
-        localStorage.setItem(
-          'react-project-token',
-          result.data.token.token
-        )
- 
-        localStorage.setItem(
-          'react-project-user',
-          JSON.stringify(result.data.user)
-        )
-        
-        setTimeout(() => {
-          window.location.reload()
-        }, 500)
-    })
-    .catch((error)=>console.log(error))
-
+const handleClosebar = (event, reason) => {
+  if (reason === "clickaway") {
+    return;
   }
+  setOpens(false);
+};
+
+const handleSuccess = (content) => {
+  setSnackContent(content);
+  setOpens(true);
+  setSeverity("success");
+};
+
+const handleFail = (content) => {
+  setSnackContent(content);
+  setOpens(true);
+  setSeverity("error");
+};
+
+
+
+const handleSubmit = (event) => {
+event.preventDefault();
+const data = new FormData(event.currentTarget);
+console.log({
+email: data.get('email'),
+password: data.get('password'),
+})
+//axios.post('https://app.spiritx.co.nz/api/login',data)
+apiPost('login',data)
+.then((result)=>{
+console.log(result)
+console.log('token', result)
+  localStorage.setItem(
+    'react-project-token',
+    result.data.token.token
+  )
+
+  localStorage.setItem(
+    'react-project-user',
+    JSON.stringify(result.data.user)
+  )
+  
+  handleSuccess('Login successfully!')
+
+  setTimeout(() => {
+    window.location.reload()
+  }, 2000)
+
+})
+.catch((error)=>handleFail('Fail'))
+ 
+}
 
   
 
@@ -105,6 +137,11 @@ const navigate = useNavigate();
             </Button>
           </Box>
         </Box>
+        <Snackbar open={opens} autoHideDuration={3000} onClose={handleClosebar}>
+          <SnackbarAlert onClose={handleClosebar} severity={severity}>
+            {snackContent}
+          </SnackbarAlert>
+        </Snackbar>
         
       </Container>
     </ThemeProvider>

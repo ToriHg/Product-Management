@@ -4,8 +4,7 @@ import PhotoSizeSelectActualIcon from '@mui/icons-material/PhotoSizeSelectActual
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined'
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined'
 import { useState } from 'react'
-
-import axios from "axios";
+import { apiPost } from './Services'
 
 
 const AddRow = ({
@@ -61,10 +60,10 @@ const AddRow = ({
     formData.append('price', addFormData.price)
     img && formData.append('product_image', img)
 
-    const token = localStorage.getItem('react-project-token') //API请求需带token
+    // const token = localStorage.getItem('react-project-token') 
+    //API请求需带token
 
-    axios
-      .post("https://app.spiritx.co.nz/api/products", formData, {headers: {token: token}})
+    apiPost('products', formData)
       .then((res) => {
         const newProducts = [res.data, ...products]
         console.log('newProducts', newProducts)

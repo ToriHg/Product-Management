@@ -2,7 +2,7 @@ import { Icon } from "@mui/material"
 import DownloadIcon from '@mui/icons-material/Download'
 import * as XLSX from 'xlsx'
 
-const ExportExcel = ({rows}) => {
+const ExportExcel = ({rows,handleSuccess,handleFail}) => {
   const handleOnExport = rows => {
     const workbook = XLSX.utils.book_new()
     const workSheet = XLSX.utils.json_to_sheet(rows)
@@ -10,6 +10,9 @@ const ExportExcel = ({rows}) => {
     XLSX.utils.book_append_sheet(workbook, workSheet, "Products")
 
     XLSX.writeFile(workbook, "MyExcel.xlsx")
+
+    !workbook ? handleFail('Fail') :
+    handleSuccess('Export successfully!')
   }
 
   return (

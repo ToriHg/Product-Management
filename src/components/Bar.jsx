@@ -1,4 +1,5 @@
-import * as React from "react";
+import { forwardRef, useEffect, useState, useMemo } from "react";
+import { Snackbar, Alert } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -17,7 +18,6 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import { useLocation } from "react-router-dom";
-
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -66,9 +66,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-
-export default function SearchAppBar({keyword,onSearch}) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+export default function SearchAppBar({ keyword, onSearch }) {
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -78,21 +77,51 @@ export default function SearchAppBar({keyword,onSearch}) {
     setAnchorEl(null);
   };
 
+//SnackBar
+  const [opens, setOpens] = useState(false);
+  const [snackContent, setSnackContent] = useState("");
+  const [severity, setSeverity] = useState("success");
+
+  const SnackbarAlert = forwardRef(function SnackbarAlert(props, ref) {
+    return <Alert elevation={6} ref={ref} {...props} />;
+  });
+
+  const handleClosebar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpens(false);
+  };
+
+  const handleSuccess = (content) => {
+    setSnackContent(content);
+    setOpens(true);
+    setSeverity("success");
+  };
+
+  const handleFail = (content) => {
+    setSnackContent(content);
+    setOpens(true);
+    setSeverity("error");
+  }; 
+
+//登出
   const logout = () => {
-    localStorage.removeItem('react-project-token')
-    localStorage.removeItem('react-project-user')
-    window.location.reload()
-  }
+    localStorage.removeItem("react-project-token");
+    localStorage.removeItem("react-project-user");
+
+    handleSuccess('Logout successfully!')
+    setTimeout(() => {
+      window.location.reload()
+    }, 2000)
+  };
 
   const location = useLocation();
 
-
   const handleClear = () => {
-    onSearch('')
-  }
+    onSearch("");
+  };
 
- 
-  
   const isLoginPage = location.pathname.search("/login") !== -1;
 
   return (
@@ -124,13 +153,12 @@ export default function SearchAppBar({keyword,onSearch}) {
             {!isLoginPage && (
               <Search>
                 <SearchIconWrapper>
-                  <SearchIcon  />
+                  <SearchIcon />
                 </SearchIconWrapper>
                 <StyledInputBase
                   placeholder="Search…"
                   inputProps={{ "aria-label": "search" }}
-        
-                  onChange={(e)=>onSearch(e.target.value)}
+                  onChange={(e) => onSearch(e.target.value)}
                 />
               </Search>
             )}
@@ -199,6 +227,11 @@ export default function SearchAppBar({keyword,onSearch}) {
           Logout
         </MenuItem>
       </Menu>
+      <Snackbar open={opens} autoHideDuration={3000} onClose={handleClosebar}>
+          <SnackbarAlert onClose={handleClosebar} severity={severity}>
+            {snackContent}
+          </SnackbarAlert>
+        </Snackbar>
     </>
   );
 }
