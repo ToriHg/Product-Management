@@ -19,8 +19,8 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import Notification from "./Notification";
 import EditableRow from "./EditableRow";
 import AddRow from "./AddRow";
+import ImportExcel from "./ImportExcel";
 import Button from "@mui/material/Button";
-import { SignalCellularNullRounded } from "@mui/icons-material";
 import UploadIcon from "@mui/icons-material/Upload";
 import DownloadIcon from "@mui/icons-material/Download";
 
@@ -118,7 +118,6 @@ export default function ProductPage({ keyWord }) {
   const [rows, setRows] = useState([]);
   const [origData, setOrigData] = useState([]); //备份data
   const [searchProducts, setSearchProducts] = useState([]);
-
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("title");
   const [page, setPage] = useState(0);
@@ -139,9 +138,10 @@ export default function ProductPage({ keyWord }) {
   useEffect(() => {
     setSearchProducts(
       origData.filter((product) => {
+        // console.log(product.title, typeof(product.title))
         if (
           product.title.toLowerCase().includes(keyWord) ||
-          product.description.toLowerCase().includes(keyWord)
+          product.description && product.description.toLowerCase().includes(keyWord)
         )
           return product;
       })
@@ -171,30 +171,6 @@ export default function ProductPage({ keyWord }) {
     setOrderBy(property);
   };
 
-
- //Upload File:
-  // const handleFileUpload = (event) => {
-  //   // get the selected file from the input
-  //   const file = event.target.files[0];
-  //   // create a new FormData object and append the file to it
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   // make a POST request to the File Upload API with the FormData object and Rapid API headers
-  //   axios
-  //   .post(`https://app.spiritx.co.nz/api/product/${formData.id}`,
-  //   formData)
-  //   .then((response) => {
-  //     // handle the response
-  //     console.log(response);
-  //   })
-  //   .catch((error) => {
-  //     // handle errors
-  //     console.log(error);
-  //   });
-
- 
-
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -214,9 +190,13 @@ export default function ProductPage({ keyWord }) {
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [searchProducts, rows, order, orderBy, page, rowsPerPage]
-  );
+  )
 
-  console.log("visibleRows", visibleRows);
+  // console.log("visibleRows", visibleRows);
+
+  useEffect(() => {
+    console.log('rows', rows)
+  }, [rows])
 
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
@@ -234,7 +214,7 @@ export default function ProductPage({ keyWord }) {
         headers: { token: localStorage.getItem("react-project-token") },
       })
       .then((res) => {
-        console.log(res);
+       
         handleClose();
         window.location.reload(false);
       })
@@ -273,7 +253,6 @@ export default function ProductPage({ keyWord }) {
     editFormData.price && formData.append("price", editFormData.price);
     image && formData.append("product_image", image);
     formData.append("_method", "PUT");
-    console.log("editFormData:", editFormData);
 
     axios
       .post(
@@ -289,7 +268,7 @@ export default function ProductPage({ keyWord }) {
         );
 
         newProducts[index] = res.data;
-        console.log(newProducts[index]);
+       // console.log(newProducts[index]);
         setRows(newProducts);
 
         setEditProductId(null); //每个id都不匹配，非编辑状态,解决异步
@@ -300,7 +279,7 @@ export default function ProductPage({ keyWord }) {
   };
 
   const handleCancelClick = () => {
-    console.log("Cancel button clicked");
+   // console.log("Cancel button clicked");
     setEditProductId(null);
   };
 
@@ -324,6 +303,7 @@ export default function ProductPage({ keyWord }) {
     setEditFormData(formValues);
   };
 
+  
   //新增产品
   const [onAdd, setOnAdd] = useState(false);
   const add = () => setOnAdd(!onAdd); //(!onAdd)为ture，打开编辑状态
@@ -334,9 +314,13 @@ export default function ProductPage({ keyWord }) {
         <Button variant="text">
           <AddCircleIcon onClick={() => add()} />
         </Button>
-
+        
         <Button variant="text">
-          <UploadIcon color="primary" />
+          <ImportExcel
+            rows={rows}
+            setRows={setRows}
+            setOrigData={setOrigData}
+          />
         </Button>
 
         <Button variant="text">
