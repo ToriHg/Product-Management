@@ -12,6 +12,8 @@ import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
+import Button from "@mui/material/Button";
+import Tooltip from '@mui/material/Tooltip';
 import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Fab from "@mui/material/Fab";
@@ -20,9 +22,7 @@ import Notification from "./Notification";
 import EditableRow from "./EditableRow";
 import AddRow from "./AddRow";
 import ImportExcel from "./ImportExcel";
-import Button from "@mui/material/Button";
-import UploadIcon from "@mui/icons-material/Upload";
-import DownloadIcon from "@mui/icons-material/Download";
+import ExportExcel from "./ExportExcel";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -311,21 +311,28 @@ export default function ProductPage({ keyWord }) {
   return (
     <Box sx={{ maxWidth: "1200px", margin: "0 auto" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <Button variant="text">
-          <AddCircleIcon onClick={() => add()} />
-        </Button>
-        
-        <Button variant="text">
-          <ImportExcel
-            rows={rows}
-            setRows={setRows}
-            setOrigData={setOrigData}
-          />
-        </Button>
 
-        <Button variant="text">
-          <DownloadIcon color="primary" />
-        </Button>
+        <Tooltip title="Add" placement="top">
+          <Button variant="text">
+            <AddCircleIcon onClick={() => add()} />
+          </Button>
+        </Tooltip>
+
+        <Tooltip title="Import Excel" placement="top">
+          <Button variant="text">
+            <ImportExcel
+              rows={rows}
+              setRows={setRows}
+              setOrigData={setOrigData}
+            />
+          </Button>
+        </Tooltip>
+        
+        <Tooltip title="Export Excel" placement="top">
+          <Button variant="text">
+            <ExportExcel rows={rows} />
+          </Button>
+        </Tooltip>
 
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
