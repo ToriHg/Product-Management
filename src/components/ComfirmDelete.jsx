@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material"
 
-const Notification = ({
+const ComfirmDelete = ({
   open,
   handleClose,
   productId,
@@ -33,4 +33,4 @@ const Notification = ({
     </div>
   )
 }
-export default Notification
+export default ComfirmDelete

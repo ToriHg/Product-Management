@@ -2,7 +2,7 @@ import { Icon } from "@mui/material"
 import UploadIcon from '@mui/icons-material/Upload'
 import * as XLSX from 'xlsx'
 
-const ImportExcel = ({ rows, setRows, setOrigData }) => {
+const ImportExcel = ({ rows, setRows, setOrigData,handleSuccess,handleFail }) => {
 
   const handleImportExcel = (e) => {
     const importFile = e.target.files[0]
@@ -18,6 +18,12 @@ const ImportExcel = ({ rows, setRows, setOrigData }) => {
       const workSheet = workbook.Sheets[workSheetName]
 
       const data = XLSX.utils.sheet_to_json(workSheet,{header:1})
+
+      const onImportSuccess = () => {
+        handleSuccess('Import successfully!')
+        setRows([...SliceRows,...rows])
+        setOrigData([...SliceRows,...rows])
+      }
      
       const SliceRows = data.slice(1).map((r) =>
         r.reduce((acc, x, i) => {
@@ -25,8 +31,12 @@ const ImportExcel = ({ rows, setRows, setOrigData }) => {
           return acc
         }, {})
       )
-      setRows([...SliceRows,...rows])
-      setOrigData([...SliceRows,...rows])
+      console.log(SliceRows)
+//判断 SliceRow长度识别 是否导入有效文档
+      SliceRows.length > 0 ?
+        onImportSuccess()
+      :
+        handleFail('Fail')
     } 
   }
   

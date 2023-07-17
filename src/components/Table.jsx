@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { forwardRef, useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import Box from "@mui/material/Box";
@@ -13,16 +13,18 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 import Button from "@mui/material/Button";
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from "@mui/material/Tooltip";
 import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Fab from "@mui/material/Fab";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import Notification from "./ComfirmDelete";
+import ComfirmDelete from "./ComfirmDelete";
+
 import EditableRow from "./EditableRow";
 import AddRow from "./AddRow";
 import ImportExcel from "./ImportExcel";
 import ExportExcel from "./ExportExcel";
+import { Snackbar, Alert } from "@mui/material";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -141,7 +143,8 @@ export default function ProductPage({ keyWord }) {
         // console.log(product.title, typeof(product.title))
         if (
           product.title.toLowerCase().includes(keyWord) ||
-          product.description && product.description.toLowerCase().includes(keyWord)
+          (product.description &&
+            product.description.toLowerCase().includes(keyWord))
         )
           return product;
       })
@@ -190,13 +193,13 @@ export default function ProductPage({ keyWord }) {
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [searchProducts, rows, order, orderBy, page, rowsPerPage]
-  )
+  );
 
   // console.log("visibleRows", visibleRows);
 
   useEffect(() => {
-    console.log('rows', rows)
-  }, [rows])
+    console.log("rows", rows);
+  }, [rows]);
 
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
@@ -214,7 +217,6 @@ export default function ProductPage({ keyWord }) {
         headers: { token: localStorage.getItem("react-project-token") },
       })
       .then((res) => {
-       
         handleClose();
         window.location.reload(false);
       })
@@ -268,7 +270,7 @@ export default function ProductPage({ keyWord }) {
         );
 
         newProducts[index] = res.data;
-       // console.log(newProducts[index]);
+        // console.log(newProducts[index]);
         setRows(newProducts);
 
         setEditProductId(null); //每个id都不匹配，非编辑状态,解决异步
@@ -279,7 +281,7 @@ export default function ProductPage({ keyWord }) {
   };
 
   const handleCancelClick = () => {
-   // console.log("Cancel button clicked");
+    // console.log("Cancel button clicked");
     setEditProductId(null);
   };
 
@@ -303,15 +305,41 @@ export default function ProductPage({ keyWord }) {
     setEditFormData(formValues);
   };
 
-  
   //新增产品
   const [onAdd, setOnAdd] = useState(false);
   const add = () => setOnAdd(!onAdd); //(!onAdd)为ture，打开编辑状态
 
+  //SnackBar
+  const [opens, setOpens] = useState(false);
+  const [snackContent, setSnackContent] = useState("");
+  const [severity, setSeverity] = useState("success");
+
+  const SnackbarAlert = forwardRef(function SnackbarAlert(props, ref) {
+    return <Alert elevation={6} ref={ref} {...props} />;
+  });
+
+  const handleClosebar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpens(false);
+  };
+
+  const handleSuccess = (content) => {
+    setSnackContent(content);
+    setOpens(true);
+    setSeverity("success");
+  };
+
+  const handleFail = (content) => {
+    setSnackContent(content);
+    setOpens(true);
+    setSeverity("error");
+  };
+
   return (
     <Box sx={{ maxWidth: "1200px", margin: "0 auto" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-
         <Tooltip title="Add" placement="top">
           <Button variant="text">
             <AddCircleIcon onClick={() => add()} />
@@ -324,13 +352,19 @@ export default function ProductPage({ keyWord }) {
               rows={rows}
               setRows={setRows}
               setOrigData={setOrigData}
+              handleSuccess={handleSuccess}
+              handleFail={handleFail}
             />
           </Button>
         </Tooltip>
-        
+
         <Tooltip title="Export Excel" placement="top">
           <Button variant="text">
-            <ExportExcel rows={rows} />
+            <ExportExcel
+              rows={rows}
+              handleSuccess={handleSuccess}
+              handleFail={handleFail}
+            />
           </Button>
         </Tooltip>
 
@@ -351,8 +385,8 @@ export default function ProductPage({ keyWord }) {
                   image={image}
                   setImage={setImage}
                   handleImageChange={(e) => handleImageChange(e)}
-                  // handleSuccess={handleSuccess}
-                  // handleFail={handleFail}
+                  handleSuccess={handleSuccess}
+                  handleFail={handleFail}
                 />
               )}
 
@@ -434,13 +468,19 @@ export default function ProductPage({ keyWord }) {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+
+        <ComfirmDelete
+          open={open}
+          handleClose={handleClose}
+          handleDeleteClick={handleDeleteClick}
+          productId={productId}
+        />
+        <Snackbar open={opens} autoHideDuration={3000} onClose={handleClosebar}>
+          <SnackbarAlert onClose={handleClosebar} severity={severity}>
+            {snackContent}
+          </SnackbarAlert>
+        </Snackbar>
       </Paper>
-      <Notification
-        open={open}
-        handleClose={handleClose}
-        handleDeleteClick={handleDeleteClick}
-        productId={productId}
-      />
     </Box>
   );
 }

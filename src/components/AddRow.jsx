@@ -14,9 +14,9 @@ const AddRow = ({
   setOnAdd,
   image,
   setImage,
-  //handleImageChange,
-  // handleSuccess,
-  // handleFail
+  handleImageChange,
+  handleSuccess,
+  handleFail
 }) => {
   const [addFormData, setAddFormData] = useState({
     category_id: '99',
@@ -70,9 +70,9 @@ const AddRow = ({
         console.log('newProducts', newProducts)
         setProducts(newProducts)
         setOnAdd(false)
-        //handleSuccess('Add form successfully!')
+        handleSuccess('Add form successfully!')
       })
-      .catch((err) =>console.log(err))  //handleFail(err.message)
+      .catch((err) =>handleFail(err.message))  
   }
 
   return (
@@ -100,14 +100,7 @@ const AddRow = ({
           onChange={handleAddFormChange}
         />
       </TableCell>
-      {/* <TableCell align='center'>
-        <TextField
-          name='category'
-          required={true}
-          placeholder='Enter a categoryId'
-          onChange={handleAddFormChange}
-        />
-      </TableCell> */}
+    
       <TableCell align='center'>
         <IconButton
           color='primary'
