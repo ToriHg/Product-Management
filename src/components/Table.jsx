@@ -18,7 +18,7 @@ import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Fab from "@mui/material/Fab";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import Notification from "./Notification";
+import Notification from "./ComfirmDelete";
 import EditableRow from "./EditableRow";
 import AddRow from "./AddRow";
 import ImportExcel from "./ImportExcel";
