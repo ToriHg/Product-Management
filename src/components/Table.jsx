@@ -25,6 +25,7 @@ import AddRow from "./AddRow";
 import ImportExcel from "./ImportExcel";
 import ExportExcel from "./ExportExcel";
 import { Snackbar, Alert } from "@mui/material";
+import { apiDelete, apiGet, apiPost } from "./Services";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -127,8 +128,8 @@ export default function ProductPage({ keyWord }) {
 
   //Returns all producrs
   useEffect(() => {
-    axios
-      .get("https://app.spiritx.co.nz/api/products")
+    apiGet('products')
+   // axios.get("https://app.spiritx.co.nz/api/products")
       .then((res) => {
         setRows(res.data);
         setOrigData(res.data);
@@ -212,10 +213,7 @@ export default function ProductPage({ keyWord }) {
 
   //删除产品
   const handleDeleteClick = (id) => {
-    axios
-      .delete(`https://app.spiritx.co.nz/api/product/${id}`, {
-        headers: { token: localStorage.getItem("react-project-token") },
-      })
+    apiDelete(`product/${id}`)
       .then((res) => {
         handleClose();
         window.location.reload(false);
@@ -256,11 +254,8 @@ export default function ProductPage({ keyWord }) {
     image && formData.append("product_image", image);
     formData.append("_method", "PUT");
 
-    axios
-      .post(
-        `https://app.spiritx.co.nz/api/product/${editFormData.id}`,
-        formData
-      )
+   // axios.post(`https://app.spiritx.co.nz/api/product/${editFormData.id}`,formData)
+    apiPost(`product${editFormData.id}`,formData)
       .then((res) => {
         const newProducts = [...rows];
         console.log("newProduct", res.data);
