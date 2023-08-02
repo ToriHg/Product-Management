@@ -14,7 +14,12 @@ const onRequest = (config) => {
     const newConfig = {
       ...config,
       headers: {
-        'token': userToken
+        //'token': userToken
+         ...config.headers,
+         
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Access-Control-Allow-Origin': '*',
+        'Authorization': 'Bearer ' + userToken,
       }
     }
     return newConfig

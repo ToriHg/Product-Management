@@ -255,7 +255,7 @@ export default function ProductPage({ keyWord }) {
     formData.append("_method", "PUT");
 
    // axios.post(`https://app.spiritx.co.nz/api/product/${editFormData.id}`,formData)
-    apiPost(`product${editFormData.id}`,formData)
+    apiPost(`product/${editFormData.id}`,formData)
       .then((res) => {
         const newProducts = [...rows];
         console.log("newProduct", res.data);

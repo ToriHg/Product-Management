@@ -66,7 +66,8 @@ console.log(result)
 console.log('token', result)
   localStorage.setItem(
     'react-project-token',
-    result.data.token.token
+    // result.data.token.token
+    result.data.token
   )
 
   localStorage.setItem(
